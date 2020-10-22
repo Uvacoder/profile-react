@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { AppBar, IconButton, InputBase, Toolbar, Typography, Badge } from '@material-ui/core';
 
@@ -48,8 +48,18 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const Header: React.FC = props => {
+type Props = {
+  movies: any,
+  setMovies: any
+}
+const Header: React.FC<Props> = props => {
     const styles= useStyles();
+    const [inputVal, setInputVal]= useState<string>('');
+
+    function updateMovies(search) {
+      setInputVal(search);
+      props.setMovies(props.movies.filter((movie: any) => movie.title.toLowerCase().includes(search)))
+    }
     return (
         <AppBar position="static">
         <Toolbar>
@@ -72,6 +82,8 @@ const Header: React.FC = props => {
               root: styles.inputRoot,
               input: styles.inputInput,
             }}
+            value={inputVal}
+            onChange={e => updateMovies(e.target.value)}
               placeholder="Search…"
               inputProps={{ 'aria-label': 'search' }}
             />

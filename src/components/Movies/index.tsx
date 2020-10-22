@@ -1,11 +1,25 @@
+import { CircularProgress } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
-import Movie from '../Movie';
+import Movie from './Movie';
+import './style.css';
+
+type Props = {
+    movies: any,
+    setMovies: any,
+    setTempMovies: any
+}
+
+type Movie = {
+    imdbID: string,
+    title: string,
+    image: string,
+    year: string
+}
 
 const API_KEY = 'c6c6506b';
 
 const series = ['avengers', 'fast and furious', 'iron man', 'harry potter']
-const Movies: React.FC = props => {
-    const [movies, setMovies] = useState([]);
+const Movies: React.FC<Props> = props => {
     useEffect(() => {
         const promises = series.map(series => {
 
@@ -14,18 +28,36 @@ const Movies: React.FC = props => {
             .then(res => res.json())
         })
         Promise.all(promises).then((movies: any) => {
-            setMovies(movies)
+
+            const updatedMovies: Movie[] = movies.map((movie: any) => movie.Search).flat(2).map(
+                (movie: any) => ({
+                    title: movie.Title,
+                    year: movie.Year,
+                    image: movie.Poster,
+                    imdb: movie.imdbID
+                })
+            )
+
+            props.setMovies(updatedMovies)
+            props.setTempMovies(updatedMovies)
         })
     }, [])
 
-    return <div className="movie">
-            {movies.map((movie: Movie) => {
-                return <Movie 
-                key= {movie.imdbID}
+    // console.log(movies);
+    if(props.movies.length === 0) {
+        return <div className="loader">
+            <CircularProgress />
+        </div>
+    }
+    return <div className="movies">
+            {props.movies.map((movie: Movie) => {
+                return <Movie
+                key={movie.imdbID}
                 title={movie.title}
                 year={movie.year}
                 image={movie.image}
-            />
+                
+                />
             })}
         </div>
 
